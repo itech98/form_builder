@@ -446,7 +446,7 @@ class   Form_Builder  extends Form_Builder_Validation {
                 // session set?
                 $i = $this->captchaImage();
                 $this->addGeneralField($image_tags_start);
-                $this->addGeneralField($i);
+                $this->addImage( $i , "130" , "60" );
                 $this->addGeneralField($image_tags_end);
                 $this->addGeneralField($captcha_text_start);
                 $this->addLabel("enter text in the image");
@@ -485,7 +485,7 @@ class   Form_Builder  extends Form_Builder_Validation {
 		ob_start();
 		imagepng($myImage);
 		$ii = '';
-		$ii .=  '<img src="data:image/png;base64,'. base64_encode(ob_get_clean() ).'" />';
+		$ii .=  'data:image/jpeg;base64,'.base64_encode(ob_get_clean() );
 		imagedestroy($myImage);
                 //
                 // SET SESSION
