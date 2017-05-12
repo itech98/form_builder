@@ -1,0 +1,41 @@
+CHANGES AS OF 04.05.2017
+========================
+
+1. Remove mysql_real_escape_string() from clean_data() function.        DONE
+
+2. Move all libraries into includes/                                    DONE
+
+3. Change add_captcha() to look in current directory.                   DONE
+
+4. Change session_status() to session_id() in various                   DONE
+
+5. Change addCaptcha() to allow text displayed to be optional.          DONE
+
+6. Correct the addDates() function comments                             DONE
+
+7. change addCaptcha AND addSecurityCode to internally set flags        DONE
+
+8. Make the check for Captcha and Security code part of 
+validate_entries() function instead of standalone functions.            DONE
+
+9. Change permission in addFileUpload() AND addMultipleFileUploads()
+from 0777 TO 0750.                                                      DONE
+
+10.Add new param to Form_Builder_Files constructor called $new_fileName DONE
+-- this is a new filename to use instead of the original if required.
+
+11. check if $captcha flag is false exit addCaptcha() function if it 
+is false as not required. check if $security_code is false and exit if
+it is as not required.                                                  DONE
+
+12. change validate_security_code() to use $this->submitted_data
+instead of $_POST.                                                      DONE
+
+13. change addSelect to accept $value to remember values                DONE
+
+14. add new example for a user profile. example_form11.php.             DONE
+
+15. Create new method called set_error - takes parameter 'error'.       DONE
+
+
+

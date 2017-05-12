@@ -40,8 +40,8 @@ function process_form() {
 echo '<h1>basic form 9 -- Registration form handled using AJAX.</h1>';
 echo 'NOTE: At the top of this example we now handle data using AJAX.';
 // include main class.
-include_once('Form_Builder.php');
-$form = new Form_Builder( true , true );
+include_once('includes/Form_Builder.php');
+$form = new Form_Builder();
 try {
     $form->addForm  ( "form9" , "post" , "example_form9.php"  );
     $form->addGeneralField( "<fieldset>" );

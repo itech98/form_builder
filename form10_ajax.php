@@ -1,6 +1,6 @@
 <?php
-include_once('Form_Builder.php');
-$form = new Form_Builder( true , true );
+include_once('includes/Form_Builder.php');
+$form = new Form_Builder();
 $form->addForm  ( "form10" , "post" , "example_form10.php"  );
 $form->addGeneralField( "<fieldset>" );
 $form->addLabel ( "Enter name" );

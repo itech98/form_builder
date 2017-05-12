@@ -5,7 +5,7 @@
 
 echo '<h1>basic form 1 -- One field + Submit Button</h1>';
 // include main class.
-include_once('Form_Builder.php');
+include_once('includes/Form_Builder.php');
 try  {
     // build new form...
     $form = new Form_Builder();

@@ -7,8 +7,8 @@
 class Form_Builder_Exception extends Exception{
   public function errorMessage() {
     //error message
-    $errorMsg = 'Error on line '.$this->getLine().' in '.$this->getFile()
-    .': <b>'.$this->getMessage().'</b> is not a valid E-Mail address';
+    $errorMsg = 'Error on line '.$this->Line().' in '.$this->File()
+    .': <b>'.$this->Message().'</b> is not a valid E-Mail address';
     return $errorMsg;
   }
 }

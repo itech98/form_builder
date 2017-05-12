@@ -95,7 +95,11 @@ final class tags    {
 				$tag="<select id=\"$this->id\"  name=\"$this->id\"   $o >";
                                 if(isset($this->tag_array['select_options'])) {
                                     foreach( $this->tag_array['select_options'] as $opt ) {
-					$tag .= "<option value=\"$opt\">$opt</option>";
+                                        if($opt==$this->value) {
+                                            $tag .= "<option selected=\"selected\"  value=\"$opt\">$opt</option>";
+                                        } else {
+                                            $tag .= "<option value=\"$opt\">$opt</option>";                                            
+                                        }
                                     }
                                 }
 				$tag.='</select>';

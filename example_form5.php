@@ -4,14 +4,15 @@
 //
 echo '<h1>form 5 -- Example custom form</h1>';
 // include main class.
-include_once('Form_Builder.php');
+include_once('includes/Form_Builder.php');
 echo 'Note - in validation we allow empty values so not ALL times need to be entered. ';
 echo 'in process_submitted_data this is the 3rd parameter - e.g.:';
 echo '$form->process_submitted_data ( $validation , array() ,  true );';
 
 
 try  {
-    $form = new Form_Builder( true , true );
+    // new form -- no captcha and no security code.
+    $form = new Form_Builder(false,false);
     $validation = array ( 'sunday0' => 'time' ,'monday0' => 'time' ,'tuesday0' => 'time' , 'wednesday0' => 'time' ,'thursday0' => 'time' ,'friday0' => 'time' ,'saturday0' => 'time' ,'sunday1' => 'time' ,'monday1' => 'time' ,'tuesday1' => 'time' ,'wednesday1' => 'time' ,'thursday1' => 'time' ,'friday1' => 'time' ,'saturday1' => 'time' ,'sunday2' => 'time' ,'monday2' => 'time' ,'tuesday2' => 'time' ,'wednesday2' => 'time' ,'thursday2' => 'time' ,'friday2' => 'time' ,'saturday2' => 'time' ,'sunday3' => 'time' ,'monday3' => 'time' ,'tuesday3' => 'time' ,'wednesday3' => 'time' ,'thursday3' => 'time' ,'friday3' => 'time' ,'saturday3' => 'time' );    
     $form->process_submitted_data ( $validation , array() ,  true );
     // FORM SUBMITTED?

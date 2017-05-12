@@ -4,109 +4,157 @@
 # e-mail : info@itech123.co.uk 
 # year: 2017
 spl_autoload_register(function ($class) {
-        if (file_exists( $class.'.php' )) {
-                require_once  $class.'.php';
+        $directory =  dirname(__FILE__).'/';
+        if (file_exists( $directory.$class.'.php' )) {
+                require_once  $directory.$class.'.php';
         } else {dir('cannot load class file...');}
 });
 
 
 
 class Form_Builder_Validation  {
-    /*
-     * $validation_fields:          associative array of fields to check- e.g. array('your_email'=>'email');
-     */
-    private $validation_fields;
-    /*
-     * $validation_mandatory:       list of mandatory(required) fields in array.
-     */
-    private $validation_mandatory;
-    /*
-     * $validation_errors:          array of errors.
-    */
-    private $validation_errors;
-    /*
-    * $validation_OK:       data deemed to be OK and any messages..
-    */
-    private $validation_OK;    
-    /*
-     * $validation_files
-     */
-    private $validation_files;
-    /*
-     * $error_messages: errors shown after validation.
-     */
-    private $error_messages;
-    /*
-     * submitted_data : ALL posted data.
-     */
-    public $submitted_data;
-    /*
-     * allow empty values
-     */
-    public $allow_empty;
+        /*
+                    add a captcha.
+        */
+        protected $captcha;
+        /*
+                    true/false whether or not to add a security hash to the form -- and check it in validation.
+        */
+        protected $security_code;    
+        /*
+         * $validation_fields:          associative array of fields to check- e.g. array('your_email'=>'email');
+         */
+        private $validation_fields;
+        /*
+         * $validation_mandatory:       list of mandatory(required) fields in array.
+         */
+        private $validation_mandatory;
+        /*
+         * $validation_errors:          array of errors.
+        */
+        private $validation_errors;
+        /*
+        * $validation_OK:       data deemed to be OK and any messages..
+        */
+        private $validation_OK;    
+        /*
+         * $validation_files
+         */
+        private $validation_files;
+        /*
+         * $error_messages: errors shown after validation.
+         */
+        private $error_messages;
+        /*
+         * submitted_data : ALL posted data.
+         */
+        public $submitted_data;
+        /*
+         * allow empty values
+         */
+        public $allow_empty;
 
      
-     
-     
-    public function __construct( $fields=array() , $mandatory=array() , $form_fields =array() , $form_files=array(), $allow_empty_values=false  ) {
-        if (!is_array( $fields ))           { throw new Form_Builder_Exception("Form_Builder_Validation: {constructor} - $fields       must be a array");    }
-        if (!is_array( $mandatory ))        { throw new Form_Builder_Exception("Form_Builder_Validation: {constructor} - $mandatory    must be a array");    }
-        if (!is_array( $form_fields ))      { throw new Form_Builder_Exception("Form_Builder_Validation: {constructor} - $form_fields  must be a array");    }
-        if (!is_bool($allow_empty_values))  { throw new Form_Builder_Exception("Form_Builder_Validation: {constructor} - $allow_empty_values  must be a boolean");    }
-        /*
-         * ALL Submitted data.
-         */
-        $this->submitted_data = $form_fields;
-        /*
-         * validation_fields: array to check - e.g. 'user_email'=>'email','age'=>'number' ...
-         */
-        $this->validation_fields    =   $fields;
-        /*
-         * validation_mandatory: array of mandatory fields to check.
-         */
-        $this->validation_mandatory =   $mandatory;
-        /*
-         * validation_errors: array of any errors found in form.
-         */
-        $this->validation_files     =   $form_files;
-        /*
-         * validation_errors: array of any errors found in form.
-         */
-        $this->validation_errors    =   array();
-        /*
-         * error_messages: complete list of ALL errors output to validation_errors array.
-         */
-        $this->error_messages       =   array(  'required_field'    =>  'required field [@field] not present!!',
-                                                'field_not_there'   =>  'field [@field] not present',
-                                                'valid_entry'       =>  '[@field] must be a [@value] !!',
-                                                'field_range'       =>  '[@field] not in range of [@value]',
-                                                'field_between'     =>  '[@field] is not between [@value1] and [@value2]',
-                                                'captcha_invalid'   =>  'Captcha Field is invalid',
-                                                'form_invalid'      =>  'Sorry cannot process form'
-                                        );
-    }
-    
-    
 
-    /**
-     *  substitute.
-     *
-     *  take a error message from array error_messages and substitute tags with values.
-     *
-     * @param array   $ar        - array of values.
-     * @param string  $error     - error element to substitute.
-     * @return strstr result.
-    */
-    private function substitute( $ar=array() , $error ) {
-            if (!is_array($ar))      { throw new Form_Builder_Exception("Form_Builder_Validation: {substitute} - $ar     must be a array");    }
-            if (!is_string($error))  { throw new Form_Builder_Exception("Form_Builder_Validation: {substitute} - $error  must be a string");    }            
-            // place $ar into $error.
-            $r= strtr( $error , $ar );
-            
-            return $r;
-    }
+
+        public function __construct( $fields=array() , $mandatory=array() , $form_fields =array() , $form_files=array(), $allow_empty_values=false  ) {
+            if (!is_array( $fields ))           { throw new Form_Builder_Exception("Form_Builder_Validation: {constructor} - $fields       must be a array");    }
+            if (!is_array( $mandatory ))        { throw new Form_Builder_Exception("Form_Builder_Validation: {constructor} - $mandatory    must be a array");    }
+            if (!is_array( $form_fields ))      { throw new Form_Builder_Exception("Form_Builder_Validation: {constructor} - $form_fields  must be a array");    }
+            if (!is_bool($allow_empty_values))  { throw new Form_Builder_Exception("Form_Builder_Validation: {constructor} - $allow_empty_values  must be a boolean");    }
+            /*
+             * ALL Submitted data.
+             */
+            $this->submitted_data = $form_fields;
+            /*
+             * validation_fields: array to check - e.g. 'user_email'=>'email','age'=>'number' ...
+             */
+            $this->validation_fields    =   $fields;
+            /*
+             * validation_mandatory: array of mandatory fields to check.
+             */
+            $this->validation_mandatory =   $mandatory;
+            /*
+             * validation_errors: array of any errors found in form.
+             */
+            $this->validation_files     =   $form_files;
+            /*
+             * validation_errors: array of any errors found in form.
+             */
+            $this->validation_errors    =   array();
+            /*
+             * error_messages: complete list of ALL errors output to validation_errors array.
+             */
+            $this->error_messages       =   array(  'required_field'    =>  'required field [@field] not present!!',
+                                                    'field_not_there'   =>  'field [@field] not present',
+                                                    'valid_entry'       =>  '[@field] must be a [@value] !!',
+                                                    'field_range'       =>  '[@field] not in range of [@value]',
+                                                    'field_between'     =>  '[@field] is not between [@value1] and [@value2]',
+                                                    'captcha_invalid'   =>  'Captcha Field is invalid',
+                                                    'form_invalid'      =>  'Sorry cannot process form'
+                                            );
+        }
+
+
+
+        /**
+         *  set_error.
+         *
+         *  add a error of type '$error' to the errors array!!
+         *
+         * @param string  $error     - error element to add
+         * @return none
+        */
+        public function set_error( $error='UNKNOWN ERROR', $val=array()  ){
+                // search for $error message in the error messages array...
+                $e =  array_key_exists ( $error , $this->error_messages );
+                if($e==false ) {
+                    // error message not found so just add it to error messages array...custom error message.
+                    $this->validation_errors[] = $error;
+                } else {
+                    // get the error message from array....
+                    $err_mess = $this->error_messages[ $error ];
+                    // set error fields+values.
+                    if(is_array($val)) {
+                        foreach ( $val  as $key => $value) {
+				$tagToReplace = "[@$key]";
+				$err_mess  =  str_replace( $tagToReplace , $value , $err_mess );
+			}
+                        $this->validation_errors[] = $err_mess;
+                    }
+                }
+        }
+
 
     
+        /**
+         * get_errors
+         *
+         * checks the captcha value entered matches the one displayed.
+         * 
+         * @param string $return_type       - type of data to return .. array..xml..json.
+         * @return the contents of private propery validation_errors().
+        */
+        public function get_errors( $return_type = 'array' ) {
+            if (!is_string($return_type))  { throw new Form_Builder_Exception("Form_Builder_Validation: {get_errors} - $return_type  must be a string");    }            
+            switch ( $return_type ) {
+                case 'array':    $return_data = $this->validation_errors;               break;
+                case 'json':     
+                                 $return_data = json_encode($this->validation_errors);
+                                 break;
+                case 'xml':      
+                                 $xml = new SimpleXMLElement('<rootTag/>');
+                                 $this->to_xml( $xml , $this->validation_errors );
+                                 $return_data =  $xml->asXML();
+                                 break;
+                default:         $return_data=$this->validation_errors;                 break;
+            }
+
+
+            return $return_data;
+        }
+
+
     
     /**
          * validate_mandatory.
@@ -125,23 +173,19 @@ class Form_Builder_Validation  {
         // check for empty form fields.
         //
         if(empty($this->submitted_data)) { return; }
-        foreach($this->validation_mandatory as $key=>$val)   {
+        foreach($this->validation_mandatory as $val)   {
             if(isset($this->submitted_data[$val])) {
               if ( empty ($this->submitted_data[$val]))  {
-                  $e = $this->error_messages['required_field'];
-                  $sub = $this->substitute( array( '[@field]' => $val) , $e  );
-                  $this->validation_errors [] = $sub;
+                  $this->set_error('required_field' ,  array( 'field'=>$val) );
               }
             }
         }
         //
         // check for items in submitted_data NOT in $_POST/$_GET.
         //
-        foreach($this->validation_mandatory as $key=>$val)   {
+        foreach($this->validation_mandatory as $val)   {
             if(!array_key_exists($val, $this->submitted_data   ))   {
-                  $e = $this->error_messages['field_not_there'];
-                  $sub = $this->substitute( array( '[@field]' => $val) , $e  );
-                  $this->validation_errors [] = $sub;
+                    $this->set_error('field_not_there' , array( 'field'=>$val) );
             }
         }
     }
@@ -167,14 +211,22 @@ class Form_Builder_Validation  {
         if(empty($this->submitted_data)) { return; }
         // loop round all validation fields...
         foreach( $this->validation_fields as $key=>$val ) {
-                $field_value = $this->submitted_data[$key];
-                                // check value $field_value is of type $val.
-                $r=$this->check_value($val , $field_value);
-                $e = $this->error_messages['valid_entry'];
-                $sub = $this->substitute( array( '[@field]' => $key ,'[@value]'=>$val ) , $e  );
-                if( $r  ==  true  ) {
-                    $this->validation_errors[] = $sub;
-                }
+                if(isset($this->submitted_data[$key])) {
+                    $field_value = $this->submitted_data[$key];
+                    // check value $field_value is of type $val.
+                    $r=$this->check_value($val , $field_value);
+                    if( $r  ==  true  ) {
+                            $this->set_error('valid_entry' , array( 'field'=>$key , 'value'=>$val )  );
+                    }        
+                }   
+        }
+        // VALIDATE CAPTCHA..
+        if($this->captcha==true) {
+            $this->validate_captcha();
+        }
+        // VALIDATE SECURITY CODE
+        if($this->security_code==true) {
+            $this->validate_security_code();
         }
     }
     
@@ -270,9 +322,9 @@ class Form_Builder_Validation  {
                             if (count($d)!=3) { $err=true; } else {
                                 // 3 elements are all numbers?
                                 if ( (is_numeric($d[0])) && (is_numeric($d[1])) && (is_numeric($d[2])) ) {
-                                    if( !checkdate($d[1], $d[0], $d[2]) ) {
+                                    if( checkdate( $d[1],$d[2],$d[0]) ) {
                                          $err=true;
-                                    }
+                                    } else {$err=false;}
                                 } else { $err=true; }
                             }
                         break;
@@ -318,17 +370,16 @@ class Form_Builder_Validation  {
          * @return true/false -- true means captcha entered is OK , false means it is wrong.
     */        
     public function validate_captcha() {
-            if (session_status() == PHP_SESSION_NONE) {session_start();}
-            $e=$this->error_messages['captcha_invalid'];
+            if (session_id() ==  '' ) {session_start();}
             $result=true;
             if ( (isset($_SESSION['captcha_code'])) && (isset($this->submitted_data['captcha'])) ) {
                 if ( $_SESSION['captcha_code']  != $this->submitted_data['captcha'] ) {
-                    $this->validation_errors[] = $e;
+                    $this->set_error('captcha_invalid',array() );
                     $result=false;
                 }
             } else {
                 $result=false; 
-                $this->validation_errors[] = $e;
+                $this->set_error('captcha_invalid' , array() );
             }
 
 
@@ -346,48 +397,19 @@ class Form_Builder_Validation  {
          * @return true/false -- true means code  is OK , false means it is wrong.
     */            
     public function validate_security_code() {
-        $e=$this->error_messages['form_invalid'];
         $result=true;
-        if (!isset($_SESSION['form_key']) || (!isset($_POST['form_key'])) ) {
+        if($this->security_code==false) { return $result; }
+        if (!isset($_SESSION['form_key']) || (!isset($this->submitted_data['form_key'])) ) {
             $result = false;
         } else {
-            if ($_SESSION['form_key'] != $_POST['form_key']) {
+            if ($_SESSION['form_key'] != $this->submitted_data['form_key']) {
                 $result = false;
             }
         }
-        if($result==false) $this->validation_errors[] = $e;
+        if($result==false) $this->validation_errors[] = $this->set_error('form_invalid' , array() );
         
         return $result;
     }
-
-    
-    
-        /**
-         * validate_captcha
-         *
-         * checks the captcha value entered matches the one displayed.
-         * 
-         * @param string $return_type       - type of data to return .. array..xml..json.
-         * @return the contents of private propery validation_errors().
-        */
-        public function get_errors( $return_type = 'array' ) {
-            if (!is_string($return_type))  { throw new Form_Builder_Exception("Form_Builder_Validation: {get_errors} - $return_type  must be a string");    }            
-            switch ( $return_type ) {
-                case 'array':    $return_data = $this->validation_errors;               break;
-                case 'json':     
-                                 $return_data = json_encode($this->validation_errors);
-                                 break;
-                case 'xml':      
-                                 $xml = new SimpleXMLElement('<rootTag/>');
-                                 $this->to_xml( $xml , $this->validation_errors );
-                                 $return_data =  $xml->asXML();
-                                 break;
-                default:         $return_data=$this->validation_errors;                 break;
-            }
-
-
-            return $return_data;
-        }
 
     
     
@@ -423,14 +445,7 @@ class Form_Builder_Validation  {
                 }
                 // handle errors...
                 if ( $condition_true == false ) {
-                        // get the appropriate error message.
-                        $e=$this->error_messages['field_range'];
-                        // build array of substitue values in error message.
-                        $a = array('[@field]'=>$field , '[@value]'=>$value);
-                        // now substitute them..
-                        $sub = $this->substitute( $a , $e  );
-                        // set error message..
-                        $this->validation_errors[]=$sub;
+                        $this->set_error('field_range' , array('field'=>$field , 'value'=>$value ));
                 }
 
                 return $condition_true;
@@ -463,14 +478,20 @@ class Form_Builder_Validation  {
                 if(isset($this->submitted_data[$value])) {
                     $v = $this->submitted_data[$value];
                     //$field_value = $this->submitted_data[$key];
-                    $e = $this->error_messages['field_between'];
-                    $a = array( '[@field]' => $key ,'[@value1]' => $start,'[@value2]' => $end );
-                    $sub = $this->substitute( $a , $e  );
+//                    $e = $this->error_messages['field_between'];
+  //                  $a = array( '[@field]' => $key ,'[@value1]' => $start,'[@value2]' => $end );
+    //                $sub = $this->substitute( $a , $e  );
 
                     if($include_values==true){
-                            if ( $v  <= $start || $value >= $end ) { $this->validation_errors[]="$value Not in range"; $condition_true = false; }
+                            if ( $v  <= $start || $value >= $end ) {
+                                $this->set_error('field_between' , array('field'=>$key,'value1'=>$start,'value2'=>$end ));
+                                $condition_true = false;
+                            }
                     } else {
-                            if ( $v  < $start || $value > $end ) { $this->validation_errors[]="$value Not in range";   $condition_true = false; }
+                            if ( $v  < $start || $value > $end )   {
+                                $this->set_error('field_between' , array('field'=>$key,'value1'=>$start,'value2'=>$end ));
+                                $condition_true = false;
+                            }
                     }
                 }
                 return $condition_true;
@@ -492,8 +513,7 @@ class Form_Builder_Validation  {
                 if (!is_string($return_type))   { throw new Form_Builder_Exception("Form_Builder_Validation: {clean_data} - $return_type    must be a string");    }
 
                 foreach( $data  as $key=>$val  ) {
-                    $cd     =   mysql_real_escape_string($val);
-                    $cd     =   strip_tags($cd);
+                    $cd     =   strip_tags($val);
                     $cd     =   htmlspecialchars($cd);
                     $data[$key]=$cd;
                 }

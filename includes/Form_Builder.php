@@ -4,8 +4,9 @@
 # e-mail : info@itech123.co.uk 
 # year: 2017
 spl_autoload_register(function ($class) {
-        if (file_exists( $class.'.php' )) {
-                require_once  $class.'.php';
+        $directory =  dirname(__FILE__).'/';
+        if (file_exists( $directory.$class.'.php' )) {
+                require_once  $directory.$class.'.php';
         } else {dir('cannot load class file...');}
 });
 
@@ -13,14 +14,6 @@ spl_autoload_register(function ($class) {
 
 
 class   Form_Builder  extends Form_Builder_Validation {
-	/*
-		add a captcha.
-	*/
-	private $captcha;
-	/*
-		true/false whether or not to add a security hash to the form -- and check it in validation.
-	*/
-	private $security_code;
 	/*
 		string of the end form.
 	*/
@@ -46,22 +39,18 @@ class   Form_Builder  extends Form_Builder_Validation {
          *
          * class constructor
          *
-         * @param boolean $captcha        - captcha required?
-         * @param boolean $security_code  - security code required?
+         * @param none
          * @return nothing.
         */
-	function __construct( $captcha = true , $security_code=true ) {
+	function __construct($add_captcha=true,$add_security_code=true) {
 		//
 		// usual form processing -- prior to form submission.
 		//
-		$this->security_code=$security_code;
-		$this->captcha=$captcha;
-//		$this->form_fields=array();
-		// need a captcha or security code?
-		if ($captcha==true || $security_code==true) {
-			// if we are using captcha AND/OR security code start a session...
-			if (session_status() == PHP_SESSION_NONE) {session_start();}
-		}
+            	$this->captcha=$add_captcha;
+                $this->security_code=$add_security_code;
+                if (($this->captcha==true) || ($this->security_code==true)) {
+                    if (session_id() ==  '') {session_start();}            
+                }
 	}
 
 
@@ -207,16 +196,18 @@ class   Form_Builder  extends Form_Builder_Validation {
          * @param int    $width - width of image
          * @param int    $height- height of image.
          * @param array  $options - array of additional options.
+         * @param string $new_fileName - new filename for uploaded file,
          * @return nothing.
         */
-	public function addFileUpload( $id='' , $upload_dir='upload' , $create_if_not_exist=true , $options=array() ) {
+	public function addFileUpload( $id='' , $upload_dir='upload' , $create_if_not_exist=true , $new_fileName='' , $options=array() ) {
                 if (!is_string($id))                    { throw new Form_Builder_Exception("Form_Builder: {addFileUpload} - $id must be a string");    }
                 if (!is_string($upload_dir))            { throw new Form_Builder_Exception("Form_Builder: {addFileUpload} - $upload_dir must be a string");    }
                 if (!is_bool($create_if_not_exist))     { throw new Form_Builder_Exception("Form_Builder: {addFileUpload} - $create_if_not_exist must be a boolean");    }
+                if (!is_string($new_fileName))          { throw new Form_Builder_Exception("Form_Builder: {addFileUpload} - $new_fileName must be a string");    }
             
                 if(!file_exists($upload_dir)) {
                     if($create_if_not_exist==true ) {
-                        $dir = mkdir( $upload_dir ,  0777  );
+                        $dir = mkdir( $upload_dir ,  0750  );
                     } else { throw new Form_Builder_Exception("Form_Builder: {addFileUpload} - file upload cannot upload files to $upload_dir"); }
                 }
             
@@ -233,7 +224,7 @@ class   Form_Builder  extends Form_Builder_Validation {
             
                 if(!file_exists($upload_dir)) {
                     if($create_if_not_exist==true ) {
-                        $dir = mkdir( $upload_dir ,  0777  );
+                        $dir = mkdir( $upload_dir ,  0750  );
                     } else { throw new Form_Builder_Exception("Form_Builder: {addFileUpload} - file upload cannot upload files to $upload_dir"); }
                 }
             
@@ -252,11 +243,11 @@ class   Form_Builder  extends Form_Builder_Validation {
          * @param array  $options - array of additional options.
          * @return nothing.
         */
-	public function addSelect( $id='' , $select_list_options=array() ,  $options=array()  ) {
+	public function addSelect( $id='' , $value ='' ,  $select_list_options=array() ,  $options=array()  ) {
                 if (!is_string($id))                    { throw new Form_Builder_Exception("Form_Builder: {addSelect} - $id must be a string");    }
                 if (!is_array($select_list_options))    { throw new Form_Builder_Exception("Form_Builder: {addSelect} - $select_list_options must be a array");    }
 
-		$t_array = array( 'tag_type'=> 'select' , 'id'=>$id ,  'select_options'=>$select_list_options  );
+		$t_array = array( 'tag_type'=> 'select' , 'id'=>$id , 'value' => $value,  'select_options'=>$select_list_options  );
 		$this->add_to_tags( $t_array , $options  );
 	}
 
@@ -398,7 +389,7 @@ class   Form_Builder  extends Form_Builder_Validation {
         
         
         /**
-         * addPHPDate
+         * addDate
          *
          * Add a date selection using select lists.
          *
@@ -415,14 +406,17 @@ class   Form_Builder  extends Form_Builder_Validation {
             if (!is_string($yearId))      { throw new Form_Builder_Exception("Form_Builder: {addDate} - $yearId must be a string");    }
             if (!is_numeric($yearStart))  { throw new Form_Builder_Exception("Form_Builder: {addDate} - $yearStart must be a number");    }
             if (!is_numeric($numYears))   { throw new Form_Builder_Exception("Form_Builder: {addDate} - $numYears must be a number");    }
-            
+
+            if (isset($this->form_data[$dayId]))   { $dd_value = $this->get_value( $dayId );   }   else {$dd_value='';}
+            if (isset($this->form_data[$monthId])) { $mm_value = $this->get_value( $monthId ); }   else {$mm_value='';}
+            if (isset($this->form_data[$yearId]))  { $yy_value = $this->get_value( $yearId );  }   else {$yy_value='';}
             // day.
             for ($d=1;$d<=31;$d++) { $day[]=$d; }
-            $this->addSelect( $dayId , $day );
+            $this->addSelect( $dayId    , $dd_value , $day );
             $months =  array( 'January','February','March','April','May','June','July','August','September','October','November','December');
-            $this->addSelect( $monthId , $months );
+            $this->addSelect( $monthId  , $mm_value , $months );
             for ( $y=$yearStart; $y<=$yearStart+$numYears; $y++ ) { $years[]=$y; }
-            $this->addSelect( $yearId , $years );
+            $this->addSelect( $yearId   , $yy_value , $years );
         }
 
         
@@ -433,26 +427,35 @@ class   Form_Builder  extends Form_Builder_Validation {
          * generate a captcha image in captchaImage() function
          * and add it and a label and input to the form
          *
-         * @param none.
+         * @param string $image_tags_start      - tag(s) to surround captcha image e.g. <div> or <p>
+         * @param string $image_tags_end        - tag(s) to end captcha image surround e.g. </div> or </p> etc
+         * @param string $captcha_text_start    - tag(s) to surround captcha text.
+         * @param string $captcha_text_end      - tag(s) to end text surround.
+         * @param string $image_text            - the actual text to display - if required - e.g. "Enter captcha image text"....
+         * @param string $input_tags_start      - tag(s) to surround captcha input box 
+         * @param string $input_tags_end        - tag(s) to end captcha input box.
          * @return none.
         */
-	function addCaptcha( $image_tags_start='',$image_tags_end='',$captcha_text_start='',$captcha_text_end=''  )  {
+	function addCaptcha( $image_tags_start='',$image_tags_end='',$captcha_text_start='',$captcha_text_end='', $input_tags_start='',$input_tags_end='', $image_text=''  )  {
                 if (!is_string($image_tags_start))    { throw new Form_Builder_Exception("Form_Builder: {addCaptcha} - $image_tags_start  must be a string");    }
                 if (!is_string($image_tags_end))      { throw new Form_Builder_Exception("Form_Builder: {addCaptcha} - $image_tags_end  must be a string");    }
                 if (!is_string($captcha_text_start )) { throw new Form_Builder_Exception("Form_Builder: {addCaptcha} - $captcha_text_start  must be a string");    }
                 if (!is_string($captcha_text_end ))   { throw new Form_Builder_Exception("Form_Builder: {addCaptcha} - $captcha_text_end  must be a string");    }
-            
-                if ($this->captcha==false) { throw new Form_Builder_Exception("Form_Builder: {addCaptcha} - new form instance set captcha to false");    }
-                // session set?
+                // check if captcha flag is true -- exit if not.
+                if($this->captcha==false) {return;}
+                // generate the new captcha image...
                 $i = $this->captchaImage();
                 $this->addGeneralField($image_tags_start);
                 $this->addImage( $i , "130" , "60" );
                 $this->addGeneralField($image_tags_end);
-                $this->addGeneralField($captcha_text_start);
-                $this->addLabel("enter text in the image");
-                $this->addGeneralField('<br />');
+                if($image_text!='') {
+                    $this->addGeneralField($captcha_text_start);
+                    $this->addLabel( $image_text );
+                    $this->addGeneralField($captcha_text_end);
+                }
+                $this->addGeneralField( $input_tags_start );                
                 $this->addInput( 'captcha' , "" , 'text'  );
-                $this->addGeneralField($captcha_text_end);
+                $this->addGeneralField( $input_tags_end );
 	}
 
 
@@ -466,8 +469,9 @@ class   Form_Builder  extends Form_Builder_Validation {
          * @return image - the generated image.
         */
 	private function captchaImage() {
-		$font_file  = 'SHADSER.TTF';
-		if (!file_exists($font_file)) { throw new Form_Builder_Exception("Form_Builder: {captchaImage} - captcha font file not found!!"); }
+                $current_dir =  dirname(__FILE__) . '/';
+                $font_file  =  $current_dir . 'SHADSER.TTF';
+                if (!file_exists($font_file)) { throw new Form_Builder_Exception("Form_Builder: {captchaImage} - captcha font file not found!!"); }
 
 		// new image 130x50.
 		$myImage = imagecreate(130, 50);
@@ -516,7 +520,6 @@ class   Form_Builder  extends Form_Builder_Validation {
                 if (!is_array($fields))             { throw new Form_Builder_Exception("Form_Builder: {process_submitted_data} - $fields  must be a array");    }
                 if (!is_array($required))           { throw new Form_Builder_Exception("Form_Builder: {process_submitted_data} - $required  must be a array");    }
                 if (!is_bool($allow_empty_values))  { throw new Form_Builder_Exception("Form_Builder: {process_submitted_data} - $allow_empty_values  must be a boolean");    }
-
 		$this->validation_fields    =   $fields;
 		$this->validation_required  =   $required;
                 $this->allow_empty          =   $allow_empty_values;
@@ -569,6 +572,8 @@ class   Form_Builder  extends Form_Builder_Validation {
          * @return none.
         */
 	public function addSecurityCode() {
+                // check if the security_code flag is true-- exit if not.
+                if($this->security_code==false) {return;}
 		//Generate the key and store it inside the class
 		$key  = $this->generateKey();
 		$_SESSION['form_key']=$key;
@@ -585,6 +590,14 @@ class   Form_Builder  extends Form_Builder_Validation {
 
 
 
+        /**
+         * get_value
+         *
+         * Function to get the POSTED/GET value of a field.
+         *
+         * @param string $field = the field to get value of.
+         * @return the value if found.
+        */
         public function get_value( $field='' ) {
             if (!is_string($field)) { throw new Form_Builder_Exception("Form_Builder: {get_value} - $field  must be a string");    }
 

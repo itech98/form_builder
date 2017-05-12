@@ -10,14 +10,13 @@ echo '      <p>2. that the Name+Age are entered</p>';
 echo '      <p>3. that the Name+Age are a string and number</p>';
 echo '      <p>4. that the Age is between 18 and 30</p>';
 // include main class.
-include_once('Form_Builder.php');
+include_once('includes/Form_Builder.php');
 try  {
-    // BUILD NEW FORM.
-    $form = new Form_Builder();
     // BUILD NEW FORM.
     $required = array( 'name' , 'age'  );
     $fields   = array( 'name'=>'string' , 'age'=>'number' );
-    $form = new Form_Builder( true , true );
+    // BUILD NEW FORM--add captcha set to False. Add security code set to True.
+    $form = new Form_Builder( false , true );
     $form->process_submitted_data( $fields , $required );
     // FORM SUBMITTED?
     if(isset($form->form_data['submit'])) {
@@ -26,13 +25,8 @@ try  {
                 $form->validate_mandatory();
                 // CHECK FOR VALID ENTRIES -- e.g. field is number etc.
                 $form->validate_entries();
-                // VALIDATE CAPTCHA..
-//                $form->validate_captcha();
-                // CLEAN THE DATA...
-  //              $form->form_data  = $form->clean_data($form->form_data);
-
                 // GET ANY ERRORS AND DISPLAY.....
-                $errors = $form->get_errors('base64');
+                $errors = $form->get_errors();
                 if(!empty($errors)){
                     foreach( $errors as $r ) {
                         echo '<font color="red">'.$r.'</font><br />';
@@ -56,6 +50,7 @@ try  {
     $form->addGeneralField('<br />');
     $form->addSubmit( "submit" , "OK" );
     $form->addGeneralField('</fieldset>');
+    $form->addSecurityCode();
     $form->EndForm();
     // OUTPUT THE FORM.
     echo $form;

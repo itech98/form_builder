@@ -15,5 +15,6 @@ echo '<p>Example 7 - Upload multiple images. <a href="example_form7.php">try it<
 echo '<p>Example 8 - Validation examples. <a href="example_form8.php">try it</a></p>';
 echo '<p>Example 9 - Form handled using AJAX. <a href="example_form9.php">try it</a></p>';
 echo '<p>Example 10- Form generated and handled using AJAX. <a href="example_form10.php">try it</a></p>';
+echo '<p>Example 11- Form for a example profile form. <a href="example_form11.php">try it</a></p>';
 
 

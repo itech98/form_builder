@@ -4,11 +4,11 @@
 //
 echo '<h1>basic form 4 -- Example using all available form fields.</h1>';
 // include main class.
-include_once('Form_Builder.php');
+include_once('includes/Form_Builder.php');
 
 
 try  {
-    $form = new Form_Builder( true , true );
+    $form = new Form_Builder();
     $form->addForm  ( "form4" , "post" , "example_form4.php"  );
 
     // INPUT
@@ -38,7 +38,7 @@ try  {
     // SELECT LIST.
     $list=array( 'hamburgers' , 'fries' , 'cheeseburger' , 'ribs' );
     $form->addGeneralField( "<p>" );
-    $form->addSelect( 'sel1' , $list );
+    $form->addSelect( 'sel1' , "" , $list );
     $form->addGeneralField( "</p>" );
     
     // CHECKBOX

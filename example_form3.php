@@ -8,14 +8,14 @@ echo '      <p>1. Generates a form with Name+Email+Message fields</p>';
 echo '      <p>2. check that the Name+Email+Message+Captcha are entered</p>';
 echo '      <p>3. that the Name+Email are a string and email</p>';
 // include main class.
-include_once('Form_Builder.php');
+include_once('includes/Form_Builder.php');
 
 
 try  {
     // BUILD NEW FORM.
     $required = array( 'name' , 'email' , 'message' );
     $fields   = array( 'name'=>'string' , 'message'=>'string' ,  'email'=>'email' );
-    $form = new Form_Builder( true , true );
+    $form = new Form_Builder();
     $form->process_submitted_data( $fields , $required );
     // FORM SUBMITTED?
     if(isset($form->form_data['submit'])) {
@@ -24,10 +24,6 @@ try  {
                 $form->validate_mandatory();
                 // CHECK FOR VALID ENTRIES -- e.g. field is number etc.
                 $form->validate_entries();
-                // VALIDATE CAPTCHA..
-                $form->validate_captcha();
-                // VALIDATE SECURITY CODE
-                $form->validate_security_code();
                 // CLEAN THE DATA...
                 $form_data  = $form->clean_data($form->submitted_data);
 
@@ -58,6 +54,7 @@ try  {
     $form->addTextArea ( "message", "" , 6 , 40 );
     $form->addGeneralField('<br />');
     $form->addCaptcha( '<div style="float:left;">','</div>','<div style="float:left;">','</div>');
+    $form->addSecurityCode();    
     $form->addGeneralField('<br />');
     $form->addSubmit( "submit_form3" , "OK" );
     $form->addGeneralField('</fieldset>');

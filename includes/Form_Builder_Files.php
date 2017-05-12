@@ -14,10 +14,10 @@ class Form_Builder_Files {
     private $file_name;
     public  $validation_files;
     private $error_messages;
-
+    private $new_fileName;
 
     
-    public function __construct( $files=array() , $file_size =20000 , $file_dir='uploads/' , $file_types=array() , $file_id='image' ) {
+    public function __construct( $files=array() , $file_size =20000 , $file_dir='uploads/' , $file_types=array() , $file_id='image' , $new_fileName='' ) {
             if (!is_array( $files ))        { throw new Form_Builder_Exception("Form_Builder_Files: {constructor} - $files       must be a array");    }
             if (!is_numeric( $file_size ))  { throw new Form_Builder_Exception("Form_Builder_Files: {constructor} - $file_size       must be a number");    }
             if (!is_string( $file_dir ))    { throw new Form_Builder_Exception("Form_Builder_Files: {constructor} - $file_dir       must be a string");    }
@@ -29,6 +29,7 @@ class Form_Builder_Files {
             $this->file_types       =   $file_types;
             $this->file_name        =   $file_id;
             $this->validation_files =   $files;
+            $this->new_fileName     =   $new_fileName;
             $this->error_messages       =   array(
                                         'file_exists'       =>  'Sorry, file already exists.',
                                         'file_too_large'    =>  'Sorry, your file is too large',
@@ -41,6 +42,38 @@ class Form_Builder_Files {
     
     
     
+
+    /**
+     * __toString
+     *
+     * used when outputing contents of a instance.
+     *
+     * @param string $out - 'array' , 'base64'
+     * @return string the uploaded files
+    */
+    public function  output($out='array') {
+            switch ($out) {
+                case 'array':
+                    foreach ( $this->validation_files as $v ) {
+                        $o[]=array( 
+                            'file' => $v['name'],
+                            'type' => $v['type'],
+                            'size' => $v['size']);                    
+                    }
+                    break;
+                //case 'base64': 
+                  //  $o=array(); 
+                    //file get contents
+                    //to base64
+                 //   break;
+            }
+
+
+            return  $o;
+    }
+
+
+
     /**
          * validate_uploaded_files
          *
@@ -54,8 +87,6 @@ class Form_Builder_Files {
             // FILES ARRAY EMPTY -- CAN BE IF USER Forgets ENCTYPE.
             //
             if (empty($this->validation_files)) {
-                    $e=$this->error_messages['file_error'];
-                    $this->validation_errors[] = $e;
                     return;
             }
             //
@@ -63,6 +94,7 @@ class Form_Builder_Files {
             //
             $target_file  =   $this->file_dir.basename($this->validation_files[$this->file_name]["name"]);
             $imageFileType = pathinfo($target_file,PATHINFO_EXTENSION);
+            if ($this->new_fileName!='') { $target_file= $this->file_dir.$this->new_fileName.'.'.$imageFileType; }
             $uploadOk=1;
             // Check if file already exists
             if (file_exists( $target_file )) {
@@ -118,6 +150,7 @@ class Form_Builder_Files {
             for($i=0; $i<$total; $i++) {
                 $target_file  =   $this->file_dir.basename($this->validation_files[$this->file_name]["name"][$i] );
                 $imageFileType = pathinfo($target_file,PATHINFO_EXTENSION);
+                if ($this->new_fileName!='') { $target_file= $this->file_dir.$this->new_fileName.'_'.$i.'.'.$imageFileType; }
                 $uploadOk=1;
                 // Check if file already exists
                 if (file_exists( $target_file )) {
@@ -168,6 +201,16 @@ class Form_Builder_Files {
 
 
                     return $return_data;
+        }
+        
+        
+        
+        /**
+         * 
+         * @return string - return the alternative filename.
+         */
+        public function get_file_name() {
+                return  $this->new_fileName;
         }
 
         

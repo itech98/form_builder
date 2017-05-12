@@ -1,5 +1,5 @@
 <?php
-include_once('Form_Builder_Validation.php');
+include_once('includes/Form_Builder_Validation.php');
 
 if (isset($_GET['pname']))  {$pname  = $_GET['pname'];}  else {$pname='';}
 if (isset($_GET['pemail'])) {$pemail = $_GET['pemail'];} else {$pemail='';}
@@ -18,8 +18,6 @@ $valid = new Form_Builder_Validation( $fields , $required , $form_fields );
 $valid->validate_mandatory();
 // Check for valid entries - e.g. valid email etc..
 $valid->validate_entries();
-// Valid captcha.
-$valid->validate_captcha();
 // GET THE ERRORS ARRAY...
 $errors = $valid->get_errors();
 // just empty braces??
